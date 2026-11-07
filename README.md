@@ -1,2 +1,33 @@
 # wow-addon-manager
-Git-first World of Warcraft addon manager for all game versions (Tauri + Rust + Svelte)
+
+A git-first World of Warcraft addon manager for every game version installed on your PC: Retail, Classic Era, Anniversary, Classic Beta and Forever.
+
+Most addons are developed in git repositories, but no single addon manager covers every source. This app aims to manage them all in one place: add, update and remove addons for each game version.
+
+## How it works
+
+- **Detects game clients** from each `_*_` folder in your WoW install (`.flavor.info` / `.build.info`).
+- **Release zips first:** installs the packaged release of a repo (GitHub/GitLab releases, picking the right zip per game version via `release.json`). Raw repositories often miss bundled libraries, so a plain `git clone` is only used as a fallback.
+- **Only touches what it owns:** every installed folder is recorded, updates are backed up and rolled back on failure, and uninstalls never delete folders the app didn't install.
+- **Sources:** GitHub, GitLab, git, WoWInterface, and later CurseForge and Wago Addons (once API keys are available).
+
+## Stack
+
+[Tauri v2](https://v2.tauri.app/) with a Rust backend and a Svelte 5 + TypeScript frontend.
+
+## Roadmap
+
+Work is tracked in [issues](https://github.com/brsnippe/wow-addon-manager/issues), grouped per phase (epics with sub-issues) and [milestones](https://github.com/brsnippe/wow-addon-manager/milestones):
+
+| Milestone | Phases |
+|---|---|
+| M1 Read-only MVP | [Phase 0: Project setup](https://github.com/brsnippe/wow-addon-manager/issues/1), [Phase 1: Read-only scanning](https://github.com/brsnippe/wow-addon-manager/issues/7) |
+| M2 GitHub updates | [Phase 2: Tracking and GitHub source](https://github.com/brsnippe/wow-addon-manager/issues/14), [Phase 3: Install, update and remove](https://github.com/brsnippe/wow-addon-manager/issues/22) |
+| M3 Git sources & import | [Phase 4: More git sources](https://github.com/brsnippe/wow-addon-manager/issues/29), [Phase 5: Import existing addons](https://github.com/brsnippe/wow-addon-manager/issues/33) |
+| M4 WoWInterface | [Phase 6: WoWInterface](https://github.com/brsnippe/wow-addon-manager/issues/38) |
+| M5 Polish & release | [Phase 8: Polish and release](https://github.com/brsnippe/wow-addon-manager/issues/48) |
+| Backlog | [Phase 7: CurseForge and Wago](https://github.com/brsnippe/wow-addon-manager/issues/42) (blocked: API keys) |
+
+## License
+
+[MIT](LICENSE)
