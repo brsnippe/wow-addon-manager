@@ -41,6 +41,19 @@ cargo --version
 node --version
 ```
 
+### Commands
+
+| Command | What it does |
+|---|---|
+| `npm install` | Install frontend dependencies |
+| `npm run tauri dev` | Run the app with hot reload |
+| `npm run tauri build` | Build a release bundle |
+| `npm run check` | Type-check the Svelte/TypeScript frontend |
+| `npm run fmt:rust` | Format the Rust code |
+| `npm run lint:rust` | Check Rust formatting and run clippy (warnings are errors) |
+| `npm run test:rust` | Run the Rust tests |
+| `npm run verify` | Run all checks, as CI does |
+
 ## Roadmap
 
 Work is tracked in [issues](https://github.com/brsnippe/wow-addon-manager/issues), grouped per phase (epics with sub-issues) and [milestones](https://github.com/brsnippe/wow-addon-manager/milestones):
