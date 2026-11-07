@@ -17,6 +17,8 @@ Most addons are developed in git repositories, but no single addon manager cover
 
 [Tauri v2](https://v2.tauri.app/) with a Rust backend and a Svelte 5 + TypeScript frontend.
 
+Key design decisions are recorded in [docs/adr](docs/adr/README.md).
+
 ## Development
 
 ### Prerequisites (Windows)
