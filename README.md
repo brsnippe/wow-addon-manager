@@ -1,5 +1,7 @@
 # wow-addon-manager
 
+[![CI](https://github.com/brsnippe/wow-addon-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/brsnippe/wow-addon-manager/actions/workflows/ci.yml)
+
 A git-first World of Warcraft addon manager for every game version installed on your PC: Retail, Classic Era, Anniversary, Classic Beta and Forever.
 
 Most addons are developed in git repositories, but no single addon manager covers every source. This app aims to manage them all in one place: add, update and remove addons for each game version.
