@@ -1,3 +1,4 @@
+pub mod clients;
 mod config;
 
 use config::{ConfigError, ResolvedWowRoot};
