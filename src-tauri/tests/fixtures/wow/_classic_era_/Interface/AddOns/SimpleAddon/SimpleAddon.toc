@@ -1,0 +1,12 @@
+## Interface: 11509
+## Title: Simple Addon
+## Notes: A single-folder addon with all source IDs.
+## Author: Fixture Author
+## Version: 1.2.3
+## SavedVariables: SimpleAddonDB
+## X-Website: https://github.com/example/SimpleAddon
+## X-Curse-Project-ID: 123456
+## X-Wago-ID: aBcDeFgH
+## X-WoWI-ID: 98765
+
+SimpleAddon.lua

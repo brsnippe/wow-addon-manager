@@ -43,6 +43,25 @@ cargo --version
 node --version
 ```
 
+### WoW folder used by the app
+
+The app looks for the World of Warcraft installation in this order:
+
+1. The `WAM_WOW_ROOT` environment variable
+2. `wowRoot` in `settings.json` in the app config folder (`%APPDATA%\com.brsnippe.wowaddonmanager`)
+3. **Debug builds only:** `dev-sandbox/` in this repository
+
+Development builds therefore never touch your real installation unless you point them at it. To fill the sandbox with a copy of your addons:
+
+```powershell
+./scripts/make-sandbox.ps1                                  # all clients, full copy
+./scripts/make-sandbox.ps1 -Clients _retail_,_forever_      # selected clients
+./scripts/make-sandbox.ps1 -TocOnly                         # only .toc files (fast, scanning only)
+./scripts/make-sandbox.ps1 -Source "D:\Games\World of Warcraft"
+```
+
+Rust tests use the small synthetic installation in `src-tauri/tests/fixtures/wow` (see its README).
+
 ### Commands
 
 | Command | What it does |

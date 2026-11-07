@@ -2,3 +2,6 @@
 *.png binary
 *.ico binary
 *.icns binary
+
+# Test fixtures are byte-exact on purpose (BOM, CRLF).
+src-tauri/tests/fixtures/** -text

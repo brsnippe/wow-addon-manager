@@ -1,0 +1,7 @@
+﻿## Interface: 120105
+## Title: |cff33ff99BOM|r and |CFFFF0000CRLF|R Addon
+## Author: Fixture Author
+## Version: 2.0
+## Notes: TOC saved with a UTF-8 BOM and CRLF line endings.
+
+BomCrlf.lua

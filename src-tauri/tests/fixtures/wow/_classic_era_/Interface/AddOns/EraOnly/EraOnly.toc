@@ -1,0 +1,8 @@
+## Interface: 11509
+## Title: Era Only
+## Notes: Only distributed on WoWInterface.
+## Author: Another Author
+## Version: v0.9
+## X-WoWI-ID: 24680
+
+EraOnly.lua
