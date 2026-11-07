@@ -41,6 +41,68 @@ pub struct GameClient {
     pub version: Option<String>,
     /// TOC interface number derived from the version, e.g. `120105`.
     pub interface: Option<u32>,
+    /// Game type the client reports to addons; decides which TOC file it loads.
+    pub game_type: Option<GameType>,
+}
+
+/// The game types the client uses to pick a TOC file and evaluate `AllowLoadGameType`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum GameType {
+    Standard,
+    Forever,
+    Vanilla,
+    Tbc,
+    Wrath,
+    Cata,
+    Mists,
+}
+
+impl GameType {
+    /// Works out the game type from the product, falling back to the interface number for
+    /// classic products, whose product code doesn't say which expansion they run.
+    pub fn detect(product: &str, interface: Option<u32>) -> Option<GameType> {
+        match product {
+            "wow" | "wowt" | "wowxptr" | "wow_beta" => return Some(GameType::Standard),
+            "wowf" => return Some(GameType::Forever),
+            _ => {}
+        }
+        let interface = interface?;
+        let (major, minor) = (interface / 10_000, interface / 100 % 100);
+        Some(match major {
+            0 => return None,
+            // Forever is versioned 1.60 and up, and its beta ships as `wow_classic_beta`.
+            1 if minor >= 50 => GameType::Forever,
+            1 => GameType::Vanilla,
+            2 => GameType::Tbc,
+            3 => GameType::Wrath,
+            4 => GameType::Cata,
+            5 => GameType::Mists,
+            _ => GameType::Standard,
+        })
+    }
+
+    /// Names this game type answers to in TOC suffixes and `AllowLoadGameType`, preferred
+    /// first. The family is not included.
+    pub fn names(self) -> &'static [&'static str] {
+        match self {
+            GameType::Standard => &["Standard"],
+            GameType::Forever => &["Camelot", "Forever"],
+            GameType::Vanilla => &["Vanilla"],
+            GameType::Tbc => &["TBC"],
+            GameType::Wrath => &["Wrath"],
+            GameType::Cata => &["Cata"],
+            GameType::Mists => &["Mists"],
+        }
+    }
+
+    /// The family name (`Mainline` or `Classic`), which also works as a TOC suffix.
+    pub fn family(self) -> &'static str {
+        match self {
+            GameType::Standard | GameType::Forever => "Mainline",
+            _ => "Classic",
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -106,9 +168,11 @@ pub fn detect_clients(wow_root: &Path) -> Result<Vec<GameClient>, ClientError> {
         };
 
         let version = version_for(&build_info, &product);
+        let interface = version.as_deref().and_then(interface_number);
         clients.push(GameClient {
             display_name: display_name(&product, &folder),
-            interface: version.as_deref().and_then(interface_number),
+            game_type: GameType::detect(&product, interface),
+            interface,
             path: entry.path(),
             folder,
             product,
@@ -283,6 +347,15 @@ mod tests {
             ]
         );
         assert_eq!(clients[0].path, fixture_root().join("_retail_"));
+        let game_types: Vec<_> = clients.iter().map(|c| c.game_type).collect();
+        assert_eq!(
+            game_types,
+            [
+                Some(GameType::Standard),
+                Some(GameType::Vanilla),
+                Some(GameType::Forever)
+            ]
+        );
     }
 
     #[test]
@@ -368,6 +441,29 @@ mod tests {
             Some("wow_anniversary")
         );
         assert_eq!(parse_flavor_info("Product Flavor!STRING:0\n"), None);
+    }
+
+    #[test]
+    fn game_types() {
+        let detect = GameType::detect;
+        assert_eq!(detect("wow", Some(120105)), Some(GameType::Standard));
+        assert_eq!(detect("wowt", None), Some(GameType::Standard));
+        assert_eq!(detect("wowf", Some(16001)), Some(GameType::Forever));
+        assert_eq!(
+            detect("wow_classic_era", Some(11509)),
+            Some(GameType::Vanilla)
+        );
+        assert_eq!(detect("wow_anniversary", Some(20506)), Some(GameType::Tbc));
+        assert_eq!(detect("wow_classic", Some(30405)), Some(GameType::Wrath));
+        assert_eq!(detect("wow_classic", Some(38002)), Some(GameType::Wrath));
+        assert_eq!(detect("wow_classic", Some(40402)), Some(GameType::Cata));
+        assert_eq!(detect("wow_classic", Some(50504)), Some(GameType::Mists));
+        assert_eq!(
+            detect("wow_classic_beta", Some(16001)),
+            Some(GameType::Forever)
+        );
+        assert_eq!(detect("wow_new", Some(130000)), Some(GameType::Standard));
+        assert_eq!(detect("wow_classic", None), None);
     }
 
     #[test]

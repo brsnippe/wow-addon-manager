@@ -1,5 +1,6 @@
 pub mod clients;
 mod config;
+pub mod toc;
 
 use config::{ConfigError, ResolvedWowRoot};
 use tauri::Manager;
