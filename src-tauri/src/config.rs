@@ -56,12 +56,6 @@ pub enum ConfigError {
     },
 }
 
-impl Serialize for ConfigError {
-    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.serialize_str(&self.to_string())
-    }
-}
-
 /// Loads the settings file. A missing file means default settings.
 pub fn load_settings(path: &Path) -> Result<Settings, ConfigError> {
     match fs::read_to_string(path) {

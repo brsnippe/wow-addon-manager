@@ -124,12 +124,6 @@ pub enum ClientError {
     },
 }
 
-impl Serialize for ClientError {
-    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.serialize_str(&self.to_string())
-    }
-}
-
 /// Lists every client folder under `wow_root`. Folders without a `.flavor.info` are skipped.
 pub fn detect_clients(wow_root: &Path) -> Result<Vec<GameClient>, ClientError> {
     if !wow_root.is_dir() {
