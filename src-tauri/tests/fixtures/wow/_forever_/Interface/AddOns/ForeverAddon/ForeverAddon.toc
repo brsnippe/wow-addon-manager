@@ -1,0 +1,8 @@
+## Interface: 16001
+## Title: Forever Addon
+## Notes: Hosted on GitLab.
+## Author: Fixture Author, Second Author
+## Version: 1.0.0-forever
+## X-Website: https://gitlab.com/example/forever-addon
+
+ForeverAddon.lua

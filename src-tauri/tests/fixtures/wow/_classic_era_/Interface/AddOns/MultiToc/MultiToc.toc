@@ -1,0 +1,7 @@
+## Interface: 120105
+## Title: Multi TOC (fallback)
+## Author: Fixture Author
+## Version: 3.0.0
+## X-Website: https://github.com/example/MultiToc
+
+MultiToc.lua

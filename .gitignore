@@ -8,3 +8,6 @@ node_modules
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Local copy of a WoW installation for development (scripts/make-sandbox.ps1)
+/dev-sandbox

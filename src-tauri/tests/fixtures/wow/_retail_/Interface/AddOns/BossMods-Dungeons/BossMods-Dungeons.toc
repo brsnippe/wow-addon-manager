@@ -1,0 +1,8 @@
+## Interface: 120105
+## Title: |cffffe00aBoss Mods|r Dungeons
+## Author: Fixture Author
+## Version: 12.1.0
+## Dependencies: BossMods-Core
+## LoadOnDemand: 1
+
+dungeons.lua
