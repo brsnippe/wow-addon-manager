@@ -15,6 +15,32 @@ Most addons are developed in git repositories, but no single addon manager cover
 
 [Tauri v2](https://v2.tauri.app/) with a Rust backend and a Svelte 5 + TypeScript frontend.
 
+## Development
+
+### Prerequisites (Windows)
+
+1. **Rust** (stable, MSVC toolchain) via rustup:
+   ```powershell
+   winget install --id Rustlang.Rustup --exact
+   ```
+   To keep the toolchain off a small system drive, set `RUSTUP_HOME` and `CARGO_HOME` (user environment variables) to a folder on another drive and add `%CARGO_HOME%\bin` to `PATH`.
+2. **Microsoft C++ Build Tools** with the MSVC compiler and the Windows 11 SDK:
+   ```powershell
+   winget install --id Microsoft.VisualStudio.2022.BuildTools --exact --override "--wait --passive --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows11SDK.26100"
+   ```
+   Add `--installPath <dir> --path cache=<dir> --path shared=<dir>` to install on another drive. The Windows SDK always installs on the system drive (~1.5 GB).
+3. **WebView2 runtime**: preinstalled on Windows 10 (1803+) and 11.
+4. **Node.js** 20 or newer.
+5. **git** (used by the git clone source).
+
+Check the setup:
+
+```powershell
+rustc --version
+cargo --version
+node --version
+```
+
 ## Roadmap
 
 Work is tracked in [issues](https://github.com/brsnippe/wow-addon-manager/issues), grouped per phase (epics with sub-issues) and [milestones](https://github.com/brsnippe/wow-addon-manager/milestones):
