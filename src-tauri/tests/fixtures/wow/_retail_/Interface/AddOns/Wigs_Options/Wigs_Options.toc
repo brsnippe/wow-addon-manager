@@ -1,0 +1,5 @@
+## Interface: 120105
+## Title: Wigs Options
+## Dependencies: Wigs, Wigs_Core
+
+options.lua

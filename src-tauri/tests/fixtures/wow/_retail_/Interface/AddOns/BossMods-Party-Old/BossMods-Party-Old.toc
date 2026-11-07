@@ -1,0 +1,8 @@
+## Interface: 120105
+## Title: |cffffe00aBoss Mods|r Old Dungeons
+## Author: Fixture Author
+## Version: 12.0.5
+## RequiredDeps: BossMods-Core
+## X-Curse-Project-ID: 222222
+
+old.lua

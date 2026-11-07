@@ -1,0 +1,7 @@
+## Interface: 120105
+## Title: |cffffe00aBoss Mods|r Status Bars
+## Author: Fixture Author
+## Version: 12.1.0
+## Group: BossMods-Core
+
+bars.lua

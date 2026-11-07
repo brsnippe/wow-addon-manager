@@ -1,3 +1,4 @@
+pub mod addons;
 pub mod clients;
 mod config;
 pub mod toc;

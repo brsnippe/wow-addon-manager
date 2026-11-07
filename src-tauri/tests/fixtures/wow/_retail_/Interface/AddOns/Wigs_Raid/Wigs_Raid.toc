@@ -1,0 +1,5 @@
+## Interface: 120105
+## Title: Wigs Raid
+## Dependencies: Wigs
+
+raid.lua

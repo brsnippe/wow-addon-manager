@@ -1,0 +1,5 @@
+## Interface: 120105
+## Title: Small Wigs Dungeon
+## Dependencies: Wigs
+
+dungeon.lua

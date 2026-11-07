@@ -42,6 +42,12 @@ pub struct Toc {
     pub interfaces: Vec<u32>,
     /// Required dependencies (`Dependencies`, `RequiredDeps` and other `Dep*` aliases).
     pub dependencies: Vec<String>,
+    /// `OptionalDeps`.
+    pub optional_dependencies: Vec<String>,
+    /// `LoadWith`.
+    pub load_with: Vec<String>,
+    /// `Group`: the addon this one is listed under in the game's addon list.
+    pub group: Option<String>,
     /// `X-Website`.
     pub website: Option<String>,
     /// `X-Curse-Project-ID`.
@@ -135,17 +141,24 @@ pub fn parse_toc(text: &str, game: Option<GameType>) -> Toc {
             "x-curse-project-id" => toc.curse_project_id = plain(),
             "x-wago-id" => toc.wago_id = plain(),
             "x-wowi-id" => toc.wowi_id = plain(),
+            "group" => toc.group = plain(),
+            "optionaldeps" => append_list(&mut toc.optional_dependencies, value),
+            "loadwith" => append_list(&mut toc.load_with, value),
             key if key == "requireddeps" || key.starts_with("dep") => {
-                for dep in value.split(',').map(str::trim).filter(|d| !d.is_empty()) {
-                    if !toc.dependencies.iter().any(|d| d == dep) {
-                        toc.dependencies.push(dep.to_owned());
-                    }
-                }
+                append_list(&mut toc.dependencies, value);
             }
             _ => {}
         }
     }
     toc
+}
+
+fn append_list(list: &mut Vec<String>, value: &str) {
+    for item in value.split(',').map(str::trim).filter(|i| !i.is_empty()) {
+        if !list.iter().any(|existing| existing == item) {
+            list.push(item.to_owned());
+        }
+    }
 }
 
 /// Removes UI escape sequences: colors (`|cAARRGGBB`, `|cnNAME:`, `|r`), textures (`|T...|t`),
@@ -299,6 +312,9 @@ mod tests {
                 author: Some("Fixture Author".into()),
                 interfaces: vec![120105],
                 dependencies: vec![],
+                optional_dependencies: vec![],
+                load_with: vec![],
+                group: None,
                 website: Some("https://github.com/example/SimpleAddon".into()),
                 curse_project_id: Some("123456".into()),
                 wago_id: Some("aBcDeFgH".into()),
@@ -434,11 +450,15 @@ mod tests {
         let toc = parse_toc(
             "## title: First\n## Title : Second\n# ## Title: comment\n  ## Title: file name\n\
              ## Dependencies: A, B\n## Dep: B,C\n## RequiredDeps: D\n## Interface: 120105, ,x, 11509\n\
-             ## Version:\n",
+             ## Version:\n## OptionalDeps: Ace3, LibStub\n## LoadWith: Blizzard_Calendar\n\
+             ## Group: Parent\n",
             Some(GameType::Standard),
         );
         assert_eq!(toc.title.as_deref(), Some("Second"));
         assert_eq!(toc.dependencies, ["A", "B", "C", "D"]);
+        assert_eq!(toc.optional_dependencies, ["Ace3", "LibStub"]);
+        assert_eq!(toc.load_with, ["Blizzard_Calendar"]);
+        assert_eq!(toc.group.as_deref(), Some("Parent"));
         assert_eq!(toc.interfaces, [120105, 11509]);
         assert_eq!(toc.version, None);
     }
