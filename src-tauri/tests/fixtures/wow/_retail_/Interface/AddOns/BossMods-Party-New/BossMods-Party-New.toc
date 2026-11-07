@@ -1,0 +1,7 @@
+## Interface: 120105
+## Title: |cffffe00aBoss Mods|r New Dungeons
+## Author: Fixture Author
+## Version: 12.0.5
+## RequiredDeps: BossMods-Core
+
+new.lua

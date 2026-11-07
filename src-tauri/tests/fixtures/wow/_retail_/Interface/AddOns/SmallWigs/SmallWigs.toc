@@ -1,0 +1,8 @@
+## Interface: 120105
+## Title: Small Wigs
+## Author: Other Author
+## Version: v200
+## Dependencies: Wigs
+## X-Curse-Project-ID: 444444
+
+small.lua

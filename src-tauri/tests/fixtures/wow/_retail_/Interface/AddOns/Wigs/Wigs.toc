@@ -1,0 +1,9 @@
+## Interface: 120105
+## Title: Wigs
+## Author: Fixture Author
+## Version: v400
+## OptionalDeps: LibStub
+## X-Curse-Project-ID: 333333
+## X-Wago-ID: wigsWago
+
+wigs.lua

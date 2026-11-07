@@ -1,0 +1,1 @@
+Wigs.options = {}
