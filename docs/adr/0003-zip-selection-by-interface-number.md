@@ -1,6 +1,6 @@
 # 3. Select release zips by interface number, flavor name as fallback
 
-- Status: Accepted
+- Status: Accepted, amended 2026-11-08 (see [Amendment](#amendment-2026-11-08))
 - Date: 2026-11-07
 
 ## Context
@@ -28,3 +28,23 @@ If no rule picks an asset, the addon is marked as having no compatible release f
 - The flavor suffix table needs maintenance when Blizzard adds clients, but it's only a fallback.
 - Users can resolve unusual naming schemes with an override instead of waiting for a code change.
 - Selection is a pure function of (release metadata, client, overrides), which keeps it easy to unit-test.
+
+## Amendment (2026-11-08)
+
+Implementing the decision (issue #18) against real releases changed four points.
+
+**The override is a flavor per client, not a pinned asset per addon.** `settings.json` gets `"flavorOverrides": { "<product>": "<flavor>" }`, keyed by product code (`wowf`, `wow_anniversary`, ...), with the packager's flavor names. An overridden client is matched on flavor only, skipping interface numbers. Interface matching already handles Forever and Anniversary for packager releases, so the per-addon pin waits until there is UI to set it (tracked in the backlog).
+
+**"Closest lower interface, same major version" became "closest interface, same flavor".** Classic Era (11509) and Forever (16001) share major version 1 but are different games, so the major version can't stand in for the flavor. When no file lists the exact interface, the file for the client's flavor with the nearest interface wins, with ties going to the higher number. A Forever client never gets a `classic` file this way, unless the user overrides it.
+
+**`release.json` is authoritative for the files it lists; other zips are judged by name.** Older packager versions list only some of the uploaded zips. For example, KuiNameplates 2.27.3a lists only the `-bcc` zip, though the release also has `-classic` and plain zips. Unlisted zips fall back to flavor words in their names, but never to the single-asset rule: a release that has a `release.json` and no file for the client has nothing for it. Files marked `nolib` are only used when no full file is published. When several files list the exact interface, the one built for the fewest flavors wins.
+
+**A release without a file for the client falls back to an older one.** The source checks up to ten releases on the addon's channel that have zips. Each may cost a `release.json` download.
+
+The selection order is now:
+
+1. **Per-client flavor override:** match `release.json` entries on that flavor only, then file names.
+2. **Interface number:** a `release.json` entry listing the client's exact interface.
+3. **Flavor in `release.json`:** the entry for the client's flavor with the closest interface.
+4. **Flavor name:** a known flavor word in the file name. For retail, this includes a single zip without one.
+5. **Single asset:** only without a `release.json`, a lone zip whose name doesn't name another flavor.
