@@ -2,6 +2,8 @@ mod addons;
 mod clients;
 mod commands;
 mod config;
+// Public until the install and update commands use it.
+pub mod state;
 mod toc;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
