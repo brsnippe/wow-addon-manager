@@ -3,6 +3,7 @@ mod clients;
 mod commands;
 mod config;
 // Public until the install and update commands use them.
+pub mod http;
 pub mod sources;
 pub mod state;
 mod toc;

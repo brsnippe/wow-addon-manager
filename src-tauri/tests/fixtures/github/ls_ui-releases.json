@@ -1,0 +1,77 @@
+[
+  {
+    "url": "https://api.github.com/repos/ls-/ls_UI/releases/268421540",
+    "html_url": "https://github.com/ls-/ls_UI/releases/tag/110207.02",
+    "id": 268421540,
+    "tag_name": "110207.02",
+    "name": "110207.02",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2025-12-08T17:38:37Z",
+    "published_at": "2025-12-08T17:39:52Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/ls-/ls_UI/releases/assets/326007426",
+        "id": 326007426,
+        "name": "ls_UI-110207.02.zip",
+        "content_type": "application/x-zip-compressed",
+        "state": "uploaded",
+        "size": 1724280,
+        "created_at": "2025-12-08T17:39:43Z",
+        "browser_download_url": "https://github.com/ls-/ls_UI/releases/download/110207.02/ls_UI-110207.02.zip"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/ls-/ls_UI/tarball/110207.02",
+    "zipball_url": "https://api.github.com/repos/ls-/ls_UI/zipball/110207.02"
+  },
+  {
+    "url": "https://api.github.com/repos/ls-/ls_UI/releases/266444397",
+    "html_url": "https://github.com/ls-/ls_UI/releases/tag/110207.01",
+    "id": 266444397,
+    "tag_name": "110207.01",
+    "name": "110207.01",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2025-12-01T16:11:54Z",
+    "published_at": "2025-12-01T16:12:48Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/ls-/ls_UI/releases/assets/322961119",
+        "id": 322961119,
+        "name": "ls_UI-110207.01.zip",
+        "content_type": "application/x-zip-compressed",
+        "state": "uploaded",
+        "size": 1724170,
+        "created_at": "2025-12-01T16:12:04Z",
+        "browser_download_url": "https://github.com/ls-/ls_UI/releases/download/110207.01/ls_UI-110207.01.zip"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/ls-/ls_UI/tarball/110207.01",
+    "zipball_url": "https://api.github.com/repos/ls-/ls_UI/zipball/110207.01"
+  },
+  {
+    "url": "https://api.github.com/repos/ls-/ls_UI/releases/252750450",
+    "html_url": "https://github.com/ls-/ls_UI/releases/tag/110205.01",
+    "id": 252750450,
+    "tag_name": "110205.01",
+    "name": "110205.01",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2025-10-07T14:57:28Z",
+    "published_at": "2025-10-07T14:58:37Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/ls-/ls_UI/releases/assets/301552854",
+        "id": 301552854,
+        "name": "ls_UI-110205.01.zip",
+        "content_type": "application/x-zip-compressed",
+        "state": "uploaded",
+        "size": 1718951,
+        "created_at": "2025-10-07T14:58:26Z",
+        "browser_download_url": "https://github.com/ls-/ls_UI/releases/download/110205.01/ls_UI-110205.01.zip"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/ls-/ls_UI/tarball/110205.01",
+    "zipball_url": "https://api.github.com/repos/ls-/ls_UI/zipball/110205.01"
+  }
+]
