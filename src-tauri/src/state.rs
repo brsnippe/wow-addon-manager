@@ -61,13 +61,22 @@ pub enum InstallMode {
     Clone,
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+/// Release channels, ordered from most to least stable.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Channel {
     #[default]
     Stable,
     Beta,
     Alpha,
+}
+
+impl Channel {
+    /// Whether an addon following this channel accepts a release from `release`:
+    /// beta also takes stable releases, alpha takes everything.
+    pub fn includes(self, release: Channel) -> bool {
+        release <= self
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -279,6 +288,20 @@ mod tests {
             .client_mut(Path::new("F:\\World of Warcraft\\_classic_era_"))
             .upsert(bigwigs());
         state
+    }
+
+    #[test]
+    fn channels_include_the_more_stable_ones() {
+        use Channel::*;
+        assert!(Stable.includes(Stable));
+        assert!(!Stable.includes(Beta));
+        assert!(!Stable.includes(Alpha));
+        assert!(Beta.includes(Stable));
+        assert!(Beta.includes(Beta));
+        assert!(!Beta.includes(Alpha));
+        assert!(Alpha.includes(Stable));
+        assert!(Alpha.includes(Beta));
+        assert!(Alpha.includes(Alpha));
     }
 
     #[test]
