@@ -7,12 +7,15 @@
 //!
 //! The sandbox default keeps development builds away from the real installation.
 
+use std::collections::BTreeMap;
 use std::ffi::OsString;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
+
+use crate::sources::Flavor;
 
 pub const WOW_ROOT_ENV: &str = "WAM_WOW_ROOT";
 pub const SETTINGS_FILE: &str = "settings.json";
@@ -21,6 +24,9 @@ pub const SETTINGS_FILE: &str = "settings.json";
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
     pub wow_root: Option<PathBuf>,
+    /// Release flavor to use per client product code, e.g. `{"wowf": "classic"}`, for
+    /// clients whose files the interface number doesn't pick correctly.
+    pub flavor_overrides: BTreeMap<String, Flavor>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -116,6 +122,7 @@ mod tests {
     fn settings_with(root: &str) -> Settings {
         Settings {
             wow_root: Some(PathBuf::from(root)),
+            ..Settings::default()
         }
     }
 
@@ -195,6 +202,37 @@ mod tests {
             load_settings(&path).unwrap(),
             settings_with("F:\\World of Warcraft")
         );
+    }
+
+    #[test]
+    fn reads_flavor_overrides_from_settings_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join(SETTINGS_FILE);
+        fs::write(
+            &path,
+            r#"{ "flavorOverrides": { "wowf": "classic", "wow_anniversary": "bcc" } }"#,
+        )
+        .unwrap();
+        let settings = load_settings(&path).unwrap();
+        assert_eq!(
+            settings.flavor_overrides.get("wowf"),
+            Some(&Flavor::Classic)
+        );
+        assert_eq!(
+            settings.flavor_overrides.get("wow_anniversary"),
+            Some(&Flavor::Bcc)
+        );
+    }
+
+    #[test]
+    fn unknown_flavors_make_the_settings_file_invalid() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join(SETTINGS_FILE);
+        fs::write(&path, r#"{ "flavorOverrides": { "wowf": "titan" } }"#).unwrap();
+        assert!(matches!(
+            load_settings(&path),
+            Err(ConfigError::Parse { .. })
+        ));
     }
 
     #[test]

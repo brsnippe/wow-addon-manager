@@ -4,8 +4,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use super::{Release, ReleaseFile, Source, SourceError};
-use crate::clients::GameClient;
+use super::{Release, ReleaseFile, Source, SourceError, Target};
 use crate::state::Channel;
 
 pub struct MockSource {
@@ -63,7 +62,7 @@ impl Source for MockSource {
     fn latest(
         &self,
         project: &str,
-        client: &GameClient,
+        target: &Target,
         channel: Channel,
     ) -> Result<Release, SourceError> {
         if self.needs_key {
@@ -81,7 +80,7 @@ impl Source for MockSource {
             return Err(SourceError::NoRelease(project.into()));
         }
         let release = on_channel
-            .find(|r| client.interface.is_some_and(|i| r.interfaces.contains(&i)))
+            .find(|r| target.interface.is_some_and(|i| r.interfaces.contains(&i)))
             .ok_or_else(|| SourceError::NoFileForClient(project.into()))?;
         Ok(Release {
             version: release.version.into(),
@@ -107,16 +106,12 @@ impl Source for MockSource {
     }
 }
 
-/// A client with just the fields sources look at filled in.
-pub fn client(interface: u32) -> GameClient {
-    GameClient {
-        folder: "_test_".into(),
-        path: PathBuf::from("_test_"),
-        product: "wow".into(),
-        display_name: "Test".into(),
-        version: None,
+/// A target known only by its interface number.
+pub fn target(interface: u32) -> Target {
+    Target {
         interface: Some(interface),
-        game_type: None,
+        flavor: None,
+        overridden: false,
     }
 }
 
@@ -167,7 +162,7 @@ mod tests {
         let source = source();
         let version = |channel| {
             source
-                .latest("BigWigs", &client(RETAIL), channel)
+                .latest("BigWigs", &target(RETAIL), channel)
                 .unwrap()
                 .version
         };
@@ -178,7 +173,7 @@ mod tests {
 
     #[test]
     fn latest_skips_releases_without_a_file_for_the_client() {
-        let release = source().latest("BigWigs", &client(ERA), Stable).unwrap();
+        let release = source().latest("BigWigs", &target(ERA), Stable).unwrap();
         assert_eq!(release.version, "v1");
         assert_eq!(release.channel, Stable);
         assert_eq!(release.file.name, "BigWigs-v1.zip");
@@ -190,7 +185,7 @@ mod tests {
         let source = source();
         let err = |project, interface, channel| {
             source
-                .latest(project, &client(interface), channel)
+                .latest(project, &target(interface), channel)
                 .unwrap_err()
         };
         assert!(matches!(
@@ -211,7 +206,7 @@ mod tests {
     fn downloads_into_the_given_directory() {
         let dir = tempfile::tempdir().unwrap();
         let source = source();
-        let release = source.latest("BigWigs", &client(RETAIL), Stable).unwrap();
+        let release = source.latest("BigWigs", &target(RETAIL), Stable).unwrap();
         let path = source.download(&release, dir.path()).unwrap();
         assert_eq!(path, dir.path().join("BigWigs-v2.zip"));
         assert_eq!(
@@ -226,7 +221,7 @@ mod tests {
         assert!(source.needs_key());
         assert!(!MockSource::new("mock", "mock.test").needs_key());
         let err = source
-            .latest("BigWigs", &client(RETAIL), Stable)
+            .latest("BigWigs", &target(RETAIL), Stable)
             .unwrap_err();
         assert!(matches!(err, SourceError::NeedsKey(_)), "{err:?}");
         assert_eq!(err.to_string(), "Mock needs an API key");

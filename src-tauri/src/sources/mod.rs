@@ -6,10 +6,12 @@
 pub mod github;
 #[cfg(test)]
 pub mod mock;
+pub mod select;
+
+pub use select::{Flavor, Target};
 
 use std::path::{Path, PathBuf};
 
-use crate::clients::GameClient;
 use crate::http::HttpError;
 use crate::state::Channel;
 
@@ -24,11 +26,11 @@ pub trait Source: Send + Sync {
     /// Returns the project id if `url` points at an addon on this source.
     fn parse_url(&self, url: &str) -> Option<String>;
 
-    /// The newest release on `channel` (or a more stable one) with a file for `client`.
+    /// The newest release on `channel` (or a more stable one) with a file for `target`.
     fn latest(
         &self,
         project: &str,
-        client: &GameClient,
+        target: &Target,
         channel: Channel,
     ) -> Result<Release, SourceError>;
 

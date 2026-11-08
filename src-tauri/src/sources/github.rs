@@ -5,12 +5,16 @@ use std::sync::Arc;
 
 use serde::Deserialize;
 
-use super::{Release, ReleaseFile, Source, SourceError};
-use crate::clients::GameClient;
+use super::select::{ReleaseJson, select_file};
+use super::{Release, ReleaseFile, Source, SourceError, Target};
 use crate::http::Http;
 use crate::state::Channel;
 
 const API: &str = "https://api.github.com";
+
+/// How many releases with zips to look through for one with a file for the client.
+/// Each may cost a `release.json` download.
+const MAX_RELEASES_CHECKED: usize = 10;
 
 pub struct GitHubSource {
     http: Arc<dyn Http>,
@@ -65,7 +69,7 @@ impl Source for GitHubSource {
     fn latest(
         &self,
         project: &str,
-        client: &GameClient,
+        target: &Target,
         channel: Channel,
     ) -> Result<Release, SourceError> {
         let releases = self.releases(project)?;
@@ -76,15 +80,20 @@ impl Source for GitHubSource {
         if on_channel.peek().is_none() {
             return Err(SourceError::NoRelease(project.into()));
         }
-        on_channel
-            .find_map(|r| {
-                pick_file(r, client).map(|file| Release {
-                    version: r.tag_name.clone(),
-                    channel: r.channel(),
+        // Releases without zips (failed uploads, source-only tags) don't count towards the limit.
+        let with_zips = on_channel
+            .filter(|r| r.zips().next().is_some())
+            .take(MAX_RELEASES_CHECKED);
+        for release in with_zips {
+            if let Some(file) = self.pick_file(release, target)? {
+                return Ok(Release {
+                    version: release.tag_name.clone(),
+                    channel: release.channel(),
                     file,
-                })
-            })
-            .ok_or_else(|| SourceError::NoFileForClient(project.into()))
+                });
+            }
+        }
+        Err(SourceError::NoFileForClient(project.into()))
     }
 
     fn download(&self, release: &Release, into_dir: &Path) -> Result<PathBuf, SourceError> {
@@ -127,19 +136,52 @@ impl GhRelease {
     }
 }
 
-/// The zip to install for `client`. For now only releases with a single zip qualify;
-/// choosing between several zips comes with `release.json` support.
-fn pick_file(release: &GhRelease, _client: &GameClient) -> Option<ReleaseFile> {
-    let mut zips = release
-        .assets
-        .iter()
-        .filter(|a| a.name.to_ascii_lowercase().ends_with(".zip"));
-    match (zips.next(), zips.next()) {
-        (Some(zip), None) => Some(ReleaseFile {
-            name: zip.name.clone(),
-            url: zip.browser_download_url.clone(),
-        }),
-        _ => None,
+impl GhRelease {
+    fn zips(&self) -> impl Iterator<Item = &GhAsset> {
+        self.assets
+            .iter()
+            .filter(|a| a.name.to_ascii_lowercase().ends_with(".zip"))
+    }
+
+    fn release_json(&self) -> Option<&GhAsset> {
+        self.assets
+            .iter()
+            .find(|a| a.name.eq_ignore_ascii_case("release.json"))
+    }
+}
+
+impl GitHubSource {
+    /// The zip in `release` to install for `target`, using its `release.json` if it has one.
+    fn pick_file(
+        &self,
+        release: &GhRelease,
+        target: &Target,
+    ) -> Result<Option<ReleaseFile>, SourceError> {
+        let release_json = match release.release_json() {
+            Some(asset) => self.fetch_release_json(asset)?,
+            None => None,
+        };
+        let zips: Vec<&GhAsset> = release.zips().collect();
+        let names: Vec<&str> = zips.iter().map(|a| a.name.as_str()).collect();
+        let chosen = select_file(&names, release_json.as_ref(), target);
+        Ok(chosen.and_then(|name| {
+            zips.iter().find(|a| a.name == name).map(|a| ReleaseFile {
+                name: a.name.clone(),
+                url: a.browser_download_url.clone(),
+            })
+        }))
+    }
+
+    /// A `release.json` that can't be parsed is ignored, so file names decide instead.
+    fn fetch_release_json(&self, asset: &GhAsset) -> Result<Option<ReleaseJson>, SourceError> {
+        let response = self.http.get(&asset.browser_download_url, &[])?;
+        if response.status != 200 {
+            return Err(SourceError::Http(format!(
+                "GitHub answered {} for {}",
+                response.status, asset.browser_download_url
+            )));
+        }
+        Ok(serde_json::from_slice(&response.body).ok())
     }
 }
 
@@ -190,9 +232,23 @@ fn project(owner: &str, repo: &str) -> Option<String> {
 mod tests {
     use super::*;
     use crate::http::recorded::RecordedHttp;
-    use crate::sources::mock::client;
+    use crate::sources::Flavor;
 
     const RETAIL: u32 = 120105;
+    const ERA: u32 = 11509;
+    const ANNIVERSARY: u32 = 20506;
+
+    fn target(interface: u32, flavor: Flavor) -> Target {
+        Target {
+            interface: Some(interface),
+            flavor: Some(flavor),
+            overridden: false,
+        }
+    }
+
+    fn retail() -> Target {
+        target(RETAIL, Flavor::Mainline)
+    }
 
     fn releases_url(project: &str) -> String {
         format!("{API}/repos/{project}/releases?per_page=100")
@@ -202,8 +258,23 @@ mod tests {
         GitHubSource::new(Arc::new(http))
     }
 
-    fn recorded(project: &str, fixture: &str) -> GitHubSource {
-        source(RecordedHttp::new().fixture(&releases_url(project), fixture))
+    /// The recorded release list of `project`, plus the recorded `release.json` of each
+    /// tag in `release_jsons`: `github/<prefix>-<tag>-release.json`.
+    fn recorded_http(project: &str, prefix: &str, release_jsons: &[&str]) -> RecordedHttp {
+        let http = RecordedHttp::new().fixture(
+            &releases_url(project),
+            &format!("github/{prefix}-releases.json"),
+        );
+        release_jsons.iter().fold(http, |http, tag| {
+            http.fixture(
+                &format!("https://github.com/{project}/releases/download/{tag}/release.json"),
+                &format!("github/{prefix}-{tag}-release.json"),
+            )
+        })
+    }
+
+    fn recorded(project: &str, prefix: &str, release_jsons: &[&str]) -> GitHubSource {
+        source(recorded_http(project, prefix, release_jsons))
     }
 
     #[test]
@@ -259,8 +330,8 @@ mod tests {
 
     #[test]
     fn finds_the_zip_of_a_packager_release() {
-        let release = recorded("BigWigsMods/BigWigs", "github/bigwigs-releases.json")
-            .latest("BigWigsMods/BigWigs", &client(RETAIL), Channel::Stable)
+        let release = recorded("BigWigsMods/BigWigs", "bigwigs", &["v427.8"])
+            .latest("BigWigsMods/BigWigs", &retail(), Channel::Stable)
             .unwrap();
         assert_eq!(
             release,
@@ -277,8 +348,8 @@ mod tests {
 
     #[test]
     fn finds_a_plain_zip_without_release_json() {
-        let release = recorded("ls-/ls_UI", "github/ls_ui-releases.json")
-            .latest("ls-/ls_UI", &client(RETAIL), Channel::Stable)
+        let release = recorded("ls-/ls_UI", "ls_ui", &[])
+            .latest("ls-/ls_UI", &retail(), Channel::Stable)
             .unwrap();
         assert_eq!(release.version, "110207.02");
         assert_eq!(release.file.name, "ls_UI-110207.02.zip");
@@ -286,19 +357,27 @@ mod tests {
 
     #[test]
     fn skips_releases_without_files() {
-        let release = recorded("WeakAuras/WeakAuras2", "github/weakauras-releases.json")
-            .latest("WeakAuras/WeakAuras2", &client(RETAIL), Channel::Stable)
+        // 5.21.8 lists classic 11508 only, so Era 11509 gets it through the flavor.
+        let source = recorded("WeakAuras/WeakAuras2", "weakauras", &["5.21.8"]);
+        let release = source
+            .latest(
+                "WeakAuras/WeakAuras2",
+                &target(ERA, Flavor::Classic),
+                Channel::Stable,
+            )
             .unwrap();
         assert_eq!(release.version, "5.21.8");
         assert_eq!(release.file.name, "WeakAuras-5.21.8.zip");
+        // It has no retail file at all.
+        let err = source
+            .latest("WeakAuras/WeakAuras2", &retail(), Channel::Stable)
+            .unwrap_err();
+        assert!(matches!(err, SourceError::NoFileForClient(_)), "{err:?}");
     }
 
     #[test]
     fn reads_channels_from_prereleases_in_publish_order() {
-        let source = recorded(
-            "kesava-wow/kuinameplates2",
-            "github/kuinameplates2-releases.json",
-        );
+        let source = recorded("kesava-wow/kuinameplates2", "kuinameplates2", &[]);
         let releases = source.releases("kesava-wow/kuinameplates2").unwrap();
         let listed: Vec<_> = releases
             .iter()
@@ -318,15 +397,83 @@ mod tests {
         );
     }
 
-    #[test]
-    fn several_zips_have_no_file_yet() {
-        let err = recorded(
+    fn kui() -> GitHubSource {
+        recorded(
             "kesava-wow/kuinameplates2",
-            "github/kuinameplates2-releases.json",
+            "kuinameplates2",
+            &["2.29.1", "2.29.0", "2.28.0", "2.27.3a"],
         )
-        .latest("kesava-wow/kuinameplates2", &client(RETAIL), Channel::Alpha)
-        .unwrap_err();
+    }
+
+    #[test]
+    fn picks_the_zip_for_the_client_from_several() {
+        let latest = |target| kui().latest("kesava-wow/kuinameplates2", &target, Channel::Alpha);
+        assert_eq!(
+            latest(retail()).unwrap().file.name,
+            "Kui_Nameplates-2.29.1.zip"
+        );
+        assert_eq!(
+            latest(target(ERA, Flavor::Classic)).unwrap().file.name,
+            "Kui_Nameplates-2.29.1-classic.zip"
+        );
+    }
+
+    #[test]
+    fn falls_back_to_an_older_release_with_a_file_for_the_client() {
+        let release = kui()
+            .latest(
+                "kesava-wow/kuinameplates2",
+                &target(ANNIVERSARY, Flavor::Bcc),
+                Channel::Stable,
+            )
+            .unwrap();
+        assert_eq!(release.version, "2.27.3a");
+        assert_eq!(release.file.name, "Kui_Nameplates-2.27.3a-bcc.zip");
+    }
+
+    #[test]
+    fn stops_looking_after_ten_releases() {
+        // Twelve releases, newest first, where only the `classic`-th has a classic zip.
+        let latest_with_classic_at =
+            |classic: usize| {
+                let releases: Vec<_> = (0..12)
+                .map(|i| {
+                    let name = if i == classic { "A-classic.zip" } else { "A-retail.zip" };
+                    serde_json::json!({
+                        "tag_name": format!("v{i}"),
+                        "published_at": format!("2026-01-{:02}T00:00:00Z", 20 - i),
+                        "assets": [{"name": name, "browser_download_url": format!("https://x/{i}")}]
+                    })
+                })
+                .collect();
+                let body = serde_json::to_vec(&releases).unwrap();
+                source(RecordedHttp::new().respond(&releases_url("o/a"), 200, body)).latest(
+                    "o/a",
+                    &target(ERA, Flavor::Classic),
+                    Channel::Stable,
+                )
+            };
+        assert_eq!(latest_with_classic_at(9).unwrap().version, "v9");
+        let err = latest_with_classic_at(10).unwrap_err();
         assert!(matches!(err, SourceError::NoFileForClient(_)), "{err:?}");
+    }
+
+    #[test]
+    fn an_unreadable_release_json_falls_back_to_file_names() {
+        let body = r#"[{"tag_name": "v1", "published_at": "2026-01-01T00:00:00Z", "assets": [
+            {"name": "A-v1.zip", "browser_download_url": "https://x/A-v1.zip"},
+            {"name": "A-v1-classic.zip", "browser_download_url": "https://x/A-v1-classic.zip"},
+            {"name": "release.json", "browser_download_url": "https://x/release.json"}
+        ]}]"#;
+        let source = source(
+            RecordedHttp::new()
+                .respond(&releases_url("o/a"), 200, body)
+                .respond("https://x/release.json", 200, "<html>not json</html>"),
+        );
+        let release = source
+            .latest("o/a", &target(ERA, Flavor::Classic), Channel::Stable)
+            .unwrap();
+        assert_eq!(release.file.name, "A-v1-classic.zip");
     }
 
     #[test]
@@ -338,7 +485,7 @@ mod tests {
              "published_at": "2026-02-01T00:00:00Z", "assets": [{"name": "A-v2.zip", "browser_download_url": "https://x/2"}]}
         ]"#;
         let source = source(RecordedHttp::new().respond(&releases_url("o/a"), 200, body));
-        let latest = |channel| source.latest("o/a", &client(RETAIL), channel);
+        let latest = |channel| source.latest("o/a", &retail(), channel);
         assert_eq!(latest(Channel::Beta).unwrap().version, "v2-beta");
         assert!(matches!(
             latest(Channel::Stable),
@@ -354,7 +501,7 @@ mod tests {
             r#"{"message":"Not Found","status":"404"}"#,
         ));
         let err = source
-            .latest("nobody/nothing", &client(RETAIL), Channel::Stable)
+            .latest("nobody/nothing", &retail(), Channel::Stable)
             .unwrap_err();
         assert!(matches!(err, SourceError::NotFound(p) if p == "nobody/nothing"));
     }
@@ -363,7 +510,7 @@ mod tests {
     fn other_statuses_are_http_errors() {
         let source = source(RecordedHttp::new().respond(&releases_url("o/a"), 500, "oops"));
         let err = source
-            .latest("o/a", &client(RETAIL), Channel::Stable)
+            .latest("o/a", &retail(), Channel::Stable)
             .unwrap_err();
         assert_eq!(
             err.to_string(),
@@ -376,16 +523,15 @@ mod tests {
         let zip_url =
             "https://github.com/BigWigsMods/BigWigs/releases/download/v427.8/BigWigs-v427.8.zip";
         let http = Arc::new(
-            RecordedHttp::new()
-                .fixture(
-                    &releases_url("BigWigsMods/BigWigs"),
-                    "github/bigwigs-releases.json",
-                )
-                .respond(zip_url, 200, "zip bytes"),
+            recorded_http("BigWigsMods/BigWigs", "bigwigs", &["v427.8"]).respond(
+                zip_url,
+                200,
+                "zip bytes",
+            ),
         );
         let source = GitHubSource::new(http.clone());
         let release = source
-            .latest("BigWigsMods/BigWigs", &client(RETAIL), Channel::Stable)
+            .latest("BigWigsMods/BigWigs", &retail(), Channel::Stable)
             .unwrap();
         let dir = tempfile::tempdir().unwrap();
         let path = source.download(&release, dir.path()).unwrap();
@@ -401,9 +547,7 @@ mod tests {
         let source = GitHubSource::new(Arc::new(crate::http::UreqHttp::new()));
         let dir = tempfile::tempdir().unwrap();
         for project in ["BigWigsMods/BigWigs", "ls-/ls_UI"] {
-            let release = source
-                .latest(project, &client(RETAIL), Channel::Stable)
-                .unwrap();
+            let release = source.latest(project, &retail(), Channel::Stable).unwrap();
             let path = source.download(&release, dir.path()).unwrap();
             let bytes = std::fs::read(&path).unwrap();
             assert!(bytes.starts_with(b"PK"), "{project}: not a zip");
