@@ -1,10 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { listAddons, listClients, toCommandError, wowRoot } from "$lib/api";
+  import { filterAddons } from "$lib/addon-filter";
   import { defaultSort, type Sort } from "$lib/addon-table";
   import { chooseClient, rememberClient, rememberedClient } from "$lib/client-choice";
   import AddonTable from "$lib/components/AddonTable.svelte";
   import ClientPicker from "$lib/components/ClientPicker.svelte";
+  import SearchBox from "$lib/components/SearchBox.svelte";
   import type { CommandError, GameClient, InstalledAddon } from "$lib/types";
 
   type Screen =
@@ -19,6 +21,8 @@
   let addonsLoading = $state(false);
   let addonsError = $state<CommandError | null>(null);
   let sort = $state<Sort>(defaultSort);
+  let query = $state("");
+  let searchBox = $state<SearchBox>();
 
   // Only the newest addon request may update the list, so a slow response for a client the
   // user already switched away from can't overwrite the current one.
@@ -26,6 +30,13 @@
 
   const clients = $derived(screen.kind === "ready" ? screen.clients : []);
   const client = $derived(clients.find((c) => c.folder === selected) ?? null);
+  const visible = $derived(filterAddons(addons, query));
+  const countText = $derived.by(() => {
+    const noun = addons.length === 1 ? "addon" : "addons";
+    return visible.length === addons.length
+      ? `${addons.length} ${noun}`
+      : `${visible.length} of ${addons.length} ${noun}`;
+  });
 
   onMount(start);
 
@@ -81,7 +92,21 @@
   function onRefresh() {
     if (screen.kind === "ready") refresh(screen.root);
   }
+
+  function clearSearch() {
+    query = "";
+    searchBox?.focus();
+  }
+
+  function onWindowKeydown(event: KeyboardEvent) {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f" && searchBox) {
+      event.preventDefault();
+      searchBox.focus();
+    }
+  }
 </script>
+
+<svelte:window onkeydown={onWindowKeydown} />
 
 <div class="app">
   <header class="toolbar">
@@ -89,10 +114,13 @@
     {#if clients.length > 0}
       <ClientPicker {clients} {selected} onselect={selectClient} />
       {#if !addonsLoading && !addonsError}
-        <span class="count">{addons.length} {addons.length === 1 ? "addon" : "addons"}</span>
+        <span class="count">{countText}</span>
       {/if}
     {/if}
     <div class="actions">
+      {#if clients.length > 0}
+        <SearchBox bind:this={searchBox} bind:value={query} />
+      {/if}
       <button
         type="button"
         class="button"
@@ -149,9 +177,15 @@
           <p>Nothing found in <code class="path">{client.path}\Interface\AddOns</code></p>
         {/if}
       </section>
+    {:else if addons.length > 0 && visible.length === 0}
+      <section class="message">
+        <h2>No addons match “{query.trim()}”</h2>
+        <p>Search looks at addon names, authors and folder names.</p>
+        <button type="button" class="button" onclick={clearSearch}>Clear search</button>
+      </section>
     {:else}
       <AddonTable
-        {addons}
+        addons={visible}
         clientInterface={client?.interface ?? null}
         loading={addonsLoading}
         bind:sort
