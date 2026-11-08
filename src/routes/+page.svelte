@@ -7,6 +7,7 @@
   import AddonTable from "$lib/components/AddonTable.svelte";
   import ClientPicker from "$lib/components/ClientPicker.svelte";
   import SearchBox from "$lib/components/SearchBox.svelte";
+  import TokenDialog from "$lib/components/TokenDialog.svelte";
   import type { CommandError, GameClient, InstalledAddon } from "$lib/types";
 
   type Screen =
@@ -23,6 +24,7 @@
   let sort = $state<Sort>(defaultSort);
   let query = $state("");
   let searchBox = $state<SearchBox>();
+  let tokenDialog = $state<TokenDialog>();
 
   // Only the newest addon request may update the list, so a slow response for a client the
   // user already switched away from can't overwrite the current one.
@@ -121,6 +123,7 @@
       {#if clients.length > 0}
         <SearchBox bind:this={searchBox} bind:value={query} />
       {/if}
+      <button type="button" class="button" onclick={() => tokenDialog?.open()}>GitHub token</button>
       <button
         type="button"
         class="button"
@@ -193,6 +196,8 @@
     {/if}
   </main>
 </div>
+
+<TokenDialog bind:this={tokenDialog} />
 
 <style>
   .app {
