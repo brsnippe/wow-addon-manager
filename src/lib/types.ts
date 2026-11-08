@@ -40,12 +40,25 @@ export interface InstalledAddon {
   wowiId: string | null;
 }
 
+/** GitHub's API rate limit that release lookups count against. */
+export interface RateLimit {
+  limit: number;
+  remaining: number;
+  /** Seconds since the Unix epoch. */
+  resetsAt: number;
+}
+
 export type ErrorKind =
   | "noWowRoot"
   | "wowRootMissing"
   | "unknownClient"
   | "config"
   | "io"
+  | "network"
+  | "rateLimited"
+  | "badToken"
+  | "credentials"
+  | "source"
   | "internal";
 
 /** What every command rejects with. */

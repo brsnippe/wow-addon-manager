@@ -1,8 +1,13 @@
 //! Blocking HTTP behind a small trait, so sources can be tested against recorded responses.
 
+mod cache;
+
+pub use cache::CachedHttp;
+
 use std::fs::{self, File};
 use std::io;
 use std::path::Path;
+use std::sync::Arc;
 
 use ureq::tls::{RootCerts, TlsConfig, TlsProvider};
 
@@ -20,10 +25,46 @@ pub trait Http: Send + Sync {
     fn download(&self, url: &str, dest: &Path) -> Result<(), HttpError>;
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+impl<T: Http + ?Sized> Http for Arc<T> {
+    fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<Response, HttpError> {
+        (**self).get(url, headers)
+    }
+
+    fn download(&self, url: &str, dest: &Path) -> Result<(), HttpError> {
+        (**self).download(url, dest)
+    }
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Response {
     pub status: u16,
+    /// Names in lower case.
+    pub headers: Vec<(String, String)>,
     pub body: Vec<u8>,
+}
+
+impl Response {
+    pub fn new(status: u16, body: impl Into<Vec<u8>>) -> Self {
+        Self {
+            status,
+            headers: Vec::new(),
+            body: body.into(),
+        }
+    }
+
+    pub fn with_header(mut self, name: &str, value: &str) -> Self {
+        self.headers
+            .push((name.to_ascii_lowercase(), value.to_string()));
+        self
+    }
+
+    /// The first value of header `name`, which must be lower case.
+    pub fn header(&self, name: &str) -> Option<&str> {
+        self.headers
+            .iter()
+            .find(|(n, _)| n == name)
+            .map(|(_, v)| v.as_str())
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -79,11 +120,27 @@ impl Http for UreqHttp {
     fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<Response, HttpError> {
         let mut response = self.call(url, headers)?;
         let status = response.status().as_u16();
-        let body = response
-            .body_mut()
-            .read_to_vec()
-            .map_err(|e| transport(url, e))?;
-        Ok(Response { status, body })
+        let headers = response
+            .headers()
+            .iter()
+            .filter_map(|(name, value)| {
+                Some((name.as_str().to_string(), value.to_str().ok()?.to_string()))
+            })
+            .collect();
+        // GitHub marks 304s as gzipped, but they have no body to decompress.
+        let body = if status == 304 {
+            Vec::new()
+        } else {
+            response
+                .body_mut()
+                .read_to_vec()
+                .map_err(|e| transport(url, e))?
+        };
+        Ok(Response {
+            status,
+            headers,
+            body,
+        })
     }
 
     fn download(&self, url: &str, dest: &Path) -> Result<(), HttpError> {
@@ -124,8 +181,14 @@ pub mod recorded {
 
     #[derive(Default)]
     pub struct RecordedHttp {
-        responses: HashMap<String, Response>,
-        requests: Mutex<Vec<String>>,
+        responses: Mutex<HashMap<String, Response>>,
+        requests: Mutex<Vec<Request>>,
+    }
+
+    struct Request {
+        url: String,
+        /// Names in lower case.
+        headers: Vec<(String, String)>,
     }
 
     impl RecordedHttp {
@@ -143,21 +206,55 @@ pub mod recorded {
             self.respond(url, 200, body)
         }
 
-        pub fn respond(mut self, url: &str, status: u16, body: impl Into<Vec<u8>>) -> Self {
-            let body = body.into();
-            self.responses
-                .insert(url.to_string(), Response { status, body });
+        pub fn respond(self, url: &str, status: u16, body: impl Into<Vec<u8>>) -> Self {
+            self.respond_with(url, Response::new(status, body))
+        }
+
+        pub fn respond_with(self, url: &str, response: Response) -> Self {
+            self.replace(url, response);
             self
+        }
+
+        /// Adds a header to the response recorded for `url`.
+        pub fn header(self, url: &str, name: &str, value: &str) -> Self {
+            let mut responses = self.responses.lock().unwrap();
+            let response = responses.get_mut(url).expect("record the response first");
+            *response = std::mem::take(response).with_header(name, value);
+            drop(responses);
+            self
+        }
+
+        /// Answers `url` differently from now on.
+        pub fn replace(&self, url: &str, response: Response) {
+            self.responses
+                .lock()
+                .unwrap()
+                .insert(url.to_string(), response);
         }
 
         /// The URLs requested so far, in order.
         pub fn requests(&self) -> Vec<String> {
-            self.requests.lock().unwrap().clone()
+            let requests = self.requests.lock().unwrap();
+            requests.iter().map(|r| r.url.clone()).collect()
         }
 
-        fn lookup(&self, url: &str) -> Response {
-            self.requests.lock().unwrap().push(url.to_string());
+        /// The headers sent with request number `index`, counting from 0.
+        pub fn request_headers(&self, index: usize) -> Vec<(String, String)> {
+            self.requests.lock().unwrap()[index].headers.clone()
+        }
+
+        fn lookup(&self, url: &str, headers: &[(&str, &str)]) -> Response {
+            let headers = headers
+                .iter()
+                .map(|(name, value)| (name.to_ascii_lowercase(), value.to_string()))
+                .collect();
+            self.requests.lock().unwrap().push(Request {
+                url: url.to_string(),
+                headers,
+            });
             self.responses
+                .lock()
+                .unwrap()
                 .get(url)
                 .unwrap_or_else(|| panic!("no recorded response for {url}"))
                 .clone()
@@ -165,12 +262,12 @@ pub mod recorded {
     }
 
     impl Http for RecordedHttp {
-        fn get(&self, url: &str, _headers: &[(&str, &str)]) -> Result<Response, HttpError> {
-            Ok(self.lookup(url))
+        fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<Response, HttpError> {
+            Ok(self.lookup(url, headers))
         }
 
         fn download(&self, url: &str, dest: &Path) -> Result<(), HttpError> {
-            let response = self.lookup(url);
+            let response = self.lookup(url, &[]);
             if !(200..300).contains(&response.status) {
                 return Err(HttpError::Status {
                     url: url.into(),

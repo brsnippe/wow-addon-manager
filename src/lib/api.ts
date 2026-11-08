@@ -1,5 +1,11 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { CommandError, GameClient, InstalledAddon, ResolvedWowRoot } from "./types";
+import type {
+  CommandError,
+  GameClient,
+  InstalledAddon,
+  RateLimit,
+  ResolvedWowRoot,
+} from "./types";
 
 /** Calls a command and rejects with a `CommandError`, whatever went wrong. */
 async function call<T>(command: string, args?: Record<string, unknown>): Promise<T> {
@@ -24,3 +30,12 @@ export const listClients = () => call<GameClient[]>("list_clients");
 
 /** Addons of the client in `folder` (e.g. `_retail_`), sorted by title. */
 export const listAddons = (folder: string) => call<InstalledAddon[]>("list_addons", { folder });
+
+export const githubTokenStored = () => call<boolean>("github_token_stored");
+
+export const githubRateLimit = () => call<RateLimit>("github_rate_limit");
+
+/** Checks the token with GitHub, then stores it. Rejects with `badToken` if GitHub refuses it. */
+export const saveGithubToken = (token: string) => call<RateLimit>("save_github_token", { token });
+
+export const removeGithubToken = () => call<void>("remove_github_token");

@@ -90,6 +90,12 @@ pub enum SourceError {
     NeedsKey(String),
     #[error("{0}")]
     Unsupported(String),
+    /// The message says when to try again.
+    #[error("{0}")]
+    RateLimited(String),
+    /// The source rejected the stored token or API key.
+    #[error("{0}")]
+    BadToken(String),
     #[error("request failed: {0}")]
     Http(String),
     #[error(transparent)]
