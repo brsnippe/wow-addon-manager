@@ -1,0 +1,332 @@
+[
+  {
+    "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/100718880",
+    "html_url": "https://github.com/kesava-wow/kuinameplates2/releases/tag/2.29.1",
+    "id": 100718880,
+    "tag_name": "2.29.1",
+    "name": "2.29.1",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2023-04-24T21:22:47Z",
+    "published_at": "2023-04-24T21:23:36Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/105113190",
+        "id": 105113190,
+        "name": "Kui_Nameplates-2.29.1-classic.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 608489,
+        "created_at": "2023-04-24T21:24:05Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.29.1/Kui_Nameplates-2.29.1-classic.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/105113164",
+        "id": 105113164,
+        "name": "Kui_Nameplates-2.29.1-wrath.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 608487,
+        "created_at": "2023-04-24T21:23:49Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.29.1/Kui_Nameplates-2.29.1-wrath.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/105113150",
+        "id": 105113150,
+        "name": "Kui_Nameplates-2.29.1.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 542041,
+        "created_at": "2023-04-24T21:23:37Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.29.1/Kui_Nameplates-2.29.1.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/105113200",
+        "id": 105113200,
+        "name": "release.json",
+        "content_type": "application/json",
+        "state": "uploaded",
+        "size": 479,
+        "created_at": "2023-04-24T21:24:10Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.29.1/release.json"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/tarball/2.29.1",
+    "zipball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/zipball/2.29.1"
+  },
+  {
+    "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/100693375",
+    "html_url": "https://github.com/kesava-wow/kuinameplates2/releases/tag/2.29.0",
+    "id": 100693375,
+    "tag_name": "2.29.0",
+    "name": "2.29.0",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2023-04-24T17:21:22Z",
+    "published_at": "2023-04-24T17:22:14Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/105088828",
+        "id": 105088828,
+        "name": "Kui_Nameplates-2.29.0-classic.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 608763,
+        "created_at": "2023-04-24T17:22:37Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.29.0/Kui_Nameplates-2.29.0-classic.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/105088816",
+        "id": 105088816,
+        "name": "Kui_Nameplates-2.29.0-wrath.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 608761,
+        "created_at": "2023-04-24T17:22:25Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.29.0/Kui_Nameplates-2.29.0-wrath.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/105088793",
+        "id": 105088793,
+        "name": "Kui_Nameplates-2.29.0.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 542314,
+        "created_at": "2023-04-24T17:22:15Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.29.0/Kui_Nameplates-2.29.0.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/105088830",
+        "id": 105088830,
+        "name": "release.json",
+        "content_type": "application/json",
+        "state": "uploaded",
+        "size": 479,
+        "created_at": "2023-04-24T17:22:38Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.29.0/release.json"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/tarball/2.29.0",
+    "zipball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/zipball/2.29.0"
+  },
+  {
+    "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/82686042",
+    "html_url": "https://github.com/kesava-wow/kuinameplates2/releases/tag/2.28.0",
+    "id": 82686042,
+    "tag_name": "2.28.0",
+    "name": "2.28.0",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2022-11-10T14:12:51Z",
+    "published_at": "2022-11-10T14:13:37Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/84147113",
+        "id": 84147113,
+        "name": "Kui_Nameplates-2.28.0-classic.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 607999,
+        "created_at": "2022-11-10T14:13:59Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.28.0/Kui_Nameplates-2.28.0-classic.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/84147094",
+        "id": 84147094,
+        "name": "Kui_Nameplates-2.28.0-wrath.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 607997,
+        "created_at": "2022-11-10T14:13:49Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.28.0/Kui_Nameplates-2.28.0-wrath.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/84147072",
+        "id": 84147072,
+        "name": "Kui_Nameplates-2.28.0.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 541546,
+        "created_at": "2022-11-10T14:13:38Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.28.0/Kui_Nameplates-2.28.0.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/84147118",
+        "id": 84147118,
+        "name": "release.json",
+        "content_type": "application/json",
+        "state": "uploaded",
+        "size": 479,
+        "created_at": "2022-11-10T14:14:01Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.28.0/release.json"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/tarball/2.28.0",
+    "zipball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/zipball/2.28.0"
+  },
+  {
+    "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/76810159",
+    "html_url": "https://github.com/kesava-wow/kuinameplates2/releases/tag/beta-giggling-shark-smiling-wolf",
+    "id": 76810159,
+    "tag_name": "beta-giggling-shark-smiling-wolf",
+    "name": "beta-giggling-shark-smiling-wolf",
+    "draft": false,
+    "prerelease": true,
+    "created_at": "2022-09-10T22:31:23Z",
+    "published_at": "2022-09-10T22:32:01Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/77478950",
+        "id": 77478950,
+        "name": "Kui_Nameplates-beta-giggling-shark-smiling-wolf-classic.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 607936,
+        "created_at": "2022-09-10T22:32:25Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/beta-giggling-shark-smiling-wolf/Kui_Nameplates-beta-giggling-shark-smiling-wolf-classic.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/77478930",
+        "id": 77478930,
+        "name": "Kui_Nameplates-beta-giggling-shark-smiling-wolf-wrath.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 607934,
+        "created_at": "2022-09-10T22:32:16Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/beta-giggling-shark-smiling-wolf/Kui_Nameplates-beta-giggling-shark-smiling-wolf-wrath.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/77478903",
+        "id": 77478903,
+        "name": "Kui_Nameplates-beta-giggling-shark-smiling-wolf.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 541485,
+        "created_at": "2022-09-10T22:32:02Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/beta-giggling-shark-smiling-wolf/Kui_Nameplates-beta-giggling-shark-smiling-wolf.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/77478956",
+        "id": 77478956,
+        "name": "release.json",
+        "content_type": "application/json",
+        "state": "uploaded",
+        "size": 634,
+        "created_at": "2022-09-10T22:32:27Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/beta-giggling-shark-smiling-wolf/release.json"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/tarball/beta-giggling-shark-smiling-wolf",
+    "zipball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/zipball/beta-giggling-shark-smiling-wolf"
+  },
+  {
+    "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/76810474",
+    "html_url": "https://github.com/kesava-wow/kuinameplates2/releases/tag/alpha-giggling-vampire-roaring-whale",
+    "id": 76810474,
+    "tag_name": "alpha-giggling-vampire-roaring-whale",
+    "name": "alpha-giggling-vampire-roaring-whale",
+    "draft": false,
+    "prerelease": true,
+    "created_at": "2022-09-10T22:55:21Z",
+    "published_at": "2022-09-10T22:56:38Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/77480544",
+        "id": 77480544,
+        "name": "Kui_Nameplates-alpha-giggling-vampire-roaring-whale-classic.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 607935,
+        "created_at": "2022-09-10T22:56:53Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/alpha-giggling-vampire-roaring-whale/Kui_Nameplates-alpha-giggling-vampire-roaring-whale-classic.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/77480537",
+        "id": 77480537,
+        "name": "Kui_Nameplates-alpha-giggling-vampire-roaring-whale-wrath.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 607932,
+        "created_at": "2022-09-10T22:56:46Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/alpha-giggling-vampire-roaring-whale/Kui_Nameplates-alpha-giggling-vampire-roaring-whale-wrath.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/77480527",
+        "id": 77480527,
+        "name": "Kui_Nameplates-alpha-giggling-vampire-roaring-whale.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 541486,
+        "created_at": "2022-09-10T22:56:39Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/alpha-giggling-vampire-roaring-whale/Kui_Nameplates-alpha-giggling-vampire-roaring-whale.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/77480546",
+        "id": 77480546,
+        "name": "release.json",
+        "content_type": "application/json",
+        "state": "uploaded",
+        "size": 658,
+        "created_at": "2022-09-10T22:56:54Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/alpha-giggling-vampire-roaring-whale/release.json"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/tarball/alpha-giggling-vampire-roaring-whale",
+    "zipball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/zipball/alpha-giggling-vampire-roaring-whale"
+  },
+  {
+    "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/43182925",
+    "html_url": "https://github.com/kesava-wow/kuinameplates2/releases/tag/2.27.3a",
+    "id": 43182925,
+    "tag_name": "2.27.3a",
+    "name": "2.27.3a",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2021-05-19T00:55:42Z",
+    "published_at": "2021-05-19T00:56:54Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/37151173",
+        "id": 37151173,
+        "name": "Kui_Nameplates-2.27.3a-bcc.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 608109,
+        "created_at": "2021-05-19T00:57:05Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.27.3a/Kui_Nameplates-2.27.3a-bcc.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/37151170",
+        "id": 37151170,
+        "name": "Kui_Nameplates-2.27.3a-classic.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 608110,
+        "created_at": "2021-05-19T00:56:55Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.27.3a/Kui_Nameplates-2.27.3a-classic.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/37151176",
+        "id": 37151176,
+        "name": "Kui_Nameplates-2.27.3a.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 541659,
+        "created_at": "2021-05-19T00:57:14Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.27.3a/Kui_Nameplates-2.27.3a.zip"
+      },
+      {
+        "url": "https://api.github.com/repos/kesava-wow/kuinameplates2/releases/assets/37151175",
+        "id": 37151175,
+        "name": "release.json",
+        "content_type": "application/json",
+        "state": "uploaded",
+        "size": 123,
+        "created_at": "2021-05-19T00:57:06Z",
+        "browser_download_url": "https://github.com/kesava-wow/kuinameplates2/releases/download/2.27.3a/release.json"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/tarball/2.27.3a",
+    "zipball_url": "https://api.github.com/repos/kesava-wow/kuinameplates2/zipball/2.27.3a"
+  }
+]

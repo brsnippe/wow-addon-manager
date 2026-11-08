@@ -1,0 +1,51 @@
+[
+  {
+    "url": "https://api.github.com/repos/WeakAuras/WeakAuras2/releases/362098187",
+    "html_url": "https://github.com/WeakAuras/WeakAuras2/releases/tag/5.21.9",
+    "id": 362098187,
+    "tag_name": "5.21.9",
+    "name": "5.21.9",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2026-07-29T23:08:23Z",
+    "published_at": "2026-07-29T23:13:35Z",
+    "assets": [],
+    "tarball_url": "https://api.github.com/repos/WeakAuras/WeakAuras2/tarball/5.21.9",
+    "zipball_url": "https://api.github.com/repos/WeakAuras/WeakAuras2/zipball/5.21.9"
+  },
+  {
+    "url": "https://api.github.com/repos/WeakAuras/WeakAuras2/releases/345956744",
+    "html_url": "https://github.com/WeakAuras/WeakAuras2/releases/tag/5.21.8",
+    "id": 345956744,
+    "tag_name": "5.21.8",
+    "name": "5.21.8",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2026-06-28T17:36:10Z",
+    "published_at": "2026-06-28T17:43:49Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/WeakAuras/WeakAuras2/releases/assets/460388884",
+        "id": 460388884,
+        "name": "release.json",
+        "content_type": "application/json",
+        "state": "uploaded",
+        "size": 409,
+        "created_at": "2026-06-28T17:43:52Z",
+        "browser_download_url": "https://github.com/WeakAuras/WeakAuras2/releases/download/5.21.8/release.json"
+      },
+      {
+        "url": "https://api.github.com/repos/WeakAuras/WeakAuras2/releases/assets/460388880",
+        "id": 460388880,
+        "name": "WeakAuras-5.21.8.zip",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 10523997,
+        "created_at": "2026-06-28T17:43:50Z",
+        "browser_download_url": "https://github.com/WeakAuras/WeakAuras2/releases/download/5.21.8/WeakAuras-5.21.8.zip"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/WeakAuras/WeakAuras2/tarball/5.21.8",
+    "zipball_url": "https://api.github.com/repos/WeakAuras/WeakAuras2/zipball/5.21.8"
+  }
+]

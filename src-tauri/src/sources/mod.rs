@@ -3,12 +3,14 @@
 //!
 //! Sources are synchronous: callers run them on a background thread.
 
+pub mod github;
 #[cfg(test)]
 pub mod mock;
 
 use std::path::{Path, PathBuf};
 
 use crate::clients::GameClient;
+use crate::http::HttpError;
 use crate::state::Channel;
 
 /// A place addons come from.
@@ -90,6 +92,15 @@ pub enum SourceError {
     Http(String),
     #[error(transparent)]
     Io(#[from] std::io::Error),
+}
+
+impl From<HttpError> for SourceError {
+    fn from(error: HttpError) -> Self {
+        match error {
+            HttpError::Io(e) => Self::Io(e),
+            other => Self::Http(other.to_string()),
+        }
+    }
 }
 
 /// All known sources, in the order they are tried when resolving a URL.
